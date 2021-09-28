@@ -1,6 +1,5 @@
 package com.revature.post_user_favorites;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -8,11 +7,10 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import software.amazon.awssdk.http.HttpStatusCode;
 
-import java.util.List;
 import java.util.Map;
 
-// endpoint is /users/favorites?user_id={id}
 public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final Gson mapper = new GsonBuilder().setPrettyPrinting().create();
@@ -26,6 +24,15 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
         this.userRepository = userRepository;
     }
 
+    /**
+     * This lambda function will take in a user_id as a query parameter and a document.
+     * The document is a new "Set" that a user favorites. The function will find the user,
+     * add the document, and then save it to the database.
+     *
+     * @param requestEvent
+     * @return
+     * @author Robert Ni
+     */
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent requestEvent, Context context) {
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
@@ -36,13 +43,21 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
         Map<String, String> pathParams = requestEvent.getQueryStringParameters();
         SetDocument setDocument = mapper.fromJson(requestEvent.getBody(), SetDocument.class);
 
+        // returns a bad request status code if params or document to be added is null
         if (pathParams == null || setDocument == null) {
-            responseEvent.setStatusCode(400);
+            responseEvent.setStatusCode(HttpStatusCode.BAD_REQUEST);
             return responseEvent;
         }
 
-        User user = userRepository.findUserById(pathParams.get("user_id"));
+        User user = userRepository.findUserById(pathParams.get("user_id")); // search for user in database
 
+        if (user == null) {
+            responseEvent.setStatusCode(HttpStatusCode.UNAUTHORIZED);
+            return responseEvent;
+        }
+
+        user.getFavoriteSets().add(setDocument); // add the document to favorites
+        responseEvent.setBody(mapper.toJson(userRepository.saveUser(user))); // save the user
         return responseEvent;
     }
 }

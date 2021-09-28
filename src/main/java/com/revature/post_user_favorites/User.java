@@ -3,7 +3,6 @@ package com.revature.post_user_favorites;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import lombok.Data;
 
 import java.util.List;
@@ -20,10 +19,10 @@ public class User {
     private String username;
 
     @DynamoDBAttribute
-    private List<Object> favoriteSets;
+    private List<SetDocument> favoriteSets;
 
     @DynamoDBAttribute
-    private List<Object> createdSets;
+    private List<SetDocument> createdSets;
 
     @DynamoDBAttribute
     private String profilePicture;
@@ -42,5 +41,4 @@ public class User {
 
     @DynamoDBAttribute
     private List<String> gameRecords;
-
 }

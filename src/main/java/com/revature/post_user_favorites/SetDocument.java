@@ -1,11 +1,13 @@
 package com.revature.post_user_favorites;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 @DynamoDBDocument
 public class SetDocument {
     private String id;

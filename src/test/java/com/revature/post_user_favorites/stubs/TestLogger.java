@@ -22,7 +22,10 @@ public class TestLogger implements LambdaLogger {
         String fileName = "" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss"));
         String filePath = logDirectoryPath + "/" + fileName + ".log";
 
-        new File(logDirectoryPath).mkdirs(); // make log directory if it doesn't exist
+        File directory = new File(logDirectoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
 
         try {
             logFileWriter = new FileWriter(filePath, true);

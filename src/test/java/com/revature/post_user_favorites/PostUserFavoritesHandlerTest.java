@@ -1,14 +1,17 @@
 package com.revature.post_user_favorites;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.revature.post_user_favorites.stubs.TestLogger;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class PostUserFavoritesHandlerTest {
@@ -42,5 +45,66 @@ public class PostUserFavoritesHandlerTest {
     public void afterEachTest() {
         sut = null;
         reset(mockContext, mockUserRepository);
+    }
+
+    @Test
+    public void given_validParamsAndValidRequestBody_returnsSuccess() {
+        SetDocument requestBody = SetDocument.builder()
+                .id("valid")
+                .name("valid")
+                .tags(new ArrayList<>())
+                .isPublic(true)
+                .views(0)
+                .plays(0)
+                .studies(0)
+                .favorites(0)
+                .build();
+
+        User validUser = User.builder()
+                .id("valid")
+                .username("valid")
+                .favoriteSets(new ArrayList<>())
+                .createdSets(new ArrayList<>())
+                .profilePicture("valid")
+                .points(0)
+                .wins(0)
+                .losses(0)
+                .registrationDate("valid")
+                .gameRecords(new ArrayList<>())
+                .build();
+
+        User expectedUser = User.builder()
+                .id("valid")
+                .username("valid")
+                .favoriteSets(new ArrayList<>())
+                .createdSets(new ArrayList<>())
+                .profilePicture("valid")
+                .points(0)
+                .wins(0)
+                .losses(0)
+                .registrationDate("valid")
+                .gameRecords(new ArrayList<>())
+                .build();
+
+        expectedUser.getFavoriteSets().add(requestBody);
+
+        APIGatewayProxyRequestEvent mockRequestEvent = new APIGatewayProxyRequestEvent();
+        mockRequestEvent.withPath("/users/favorites");
+        mockRequestEvent.withHttpMethod("POST");
+        mockRequestEvent.withHeaders(null);
+        mockRequestEvent.withBody(mapper.toJson(requestBody));
+        mockRequestEvent.withQueryStringParameters(Collections.singletonMap("user_id", "valid"));
+
+        when(mockUserRepository.findUserById(anyString())).thenReturn(validUser);
+        when(mockUserRepository.saveUser(any())).thenReturn(expectedUser);
+
+        APIGatewayProxyResponseEvent expectedResponse = new APIGatewayProxyResponseEvent();
+        expectedResponse.setBody(mapper.toJson(expectedUser));
+
+        APIGatewayProxyResponseEvent actualResponse = sut.handleRequest(mockRequestEvent, mockContext);
+
+        verify(mockUserRepository, times(1)).findUserById(anyString());
+        verify(mockUserRepository, times(1)).saveUser(any());
+        assertEquals(expectedResponse, actualResponse);
     }
 }

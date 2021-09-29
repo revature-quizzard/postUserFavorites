@@ -2,6 +2,7 @@ package com.revature.post_user_favorites.stubs;
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -11,7 +12,6 @@ import java.util.Arrays;
 
 public class TestLogger implements LambdaLogger {
 
-    // Fancy colors
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
 
@@ -21,6 +21,8 @@ public class TestLogger implements LambdaLogger {
         String logDirectoryPath = "src/test/resources/logs";
         String fileName = "" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss"));
         String filePath = logDirectoryPath + "/" + fileName + ".log";
+
+        new File(logDirectoryPath).mkdirs(); // make log directory if it doesn't exist
 
         try {
             logFileWriter = new FileWriter(filePath, true);

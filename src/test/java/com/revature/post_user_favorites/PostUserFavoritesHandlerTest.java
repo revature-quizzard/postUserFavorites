@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.revature.post_user_favorites.stubs.TestLogger;
 import org.junit.jupiter.api.*;
+import software.amazon.awssdk.http.HttpStatusCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,6 +106,25 @@ public class PostUserFavoritesHandlerTest {
 
         verify(mockUserRepository, times(1)).findUserById(anyString());
         verify(mockUserRepository, times(1)).saveUser(any());
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    public void given_noRequestBody_returnBadRequestStatusCode() {
+        APIGatewayProxyRequestEvent mockRequestEvent = new APIGatewayProxyRequestEvent();
+        mockRequestEvent.withPath("/users/favorites");
+        mockRequestEvent.withHttpMethod("POST");
+        mockRequestEvent.withHeaders(null);
+        mockRequestEvent.withBody(null);
+        mockRequestEvent.withQueryStringParameters(Collections.singletonMap("user_id", "valid"));
+
+        APIGatewayProxyResponseEvent expectedResponse = new APIGatewayProxyResponseEvent();
+        expectedResponse.setStatusCode(HttpStatusCode.BAD_REQUEST);
+
+        APIGatewayProxyResponseEvent actualResponse = sut.handleRequest(mockRequestEvent, mockContext);
+
+        verify(mockUserRepository, times(0)).saveUser(any());
+        verify(mockUserRepository, times(0)).findUserById(any());
         assertEquals(expectedResponse, actualResponse);
     }
 }

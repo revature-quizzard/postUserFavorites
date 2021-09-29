@@ -4,46 +4,43 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.revature.post_user_favorites.stubs.TestLogger;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
-class PostUserFavoritesHandlerTest {
+import static org.mockito.Mockito.*;
+
+public class PostUserFavoritesHandlerTest {
 
     static TestLogger testLogger;
-    private Gson mapper = new GsonBuilder().setPrettyPrinting().create();
+    static final Gson mapper = new GsonBuilder().setPrettyPrinting().create();
 
     PostUserFavoritesHandler sut;
     Context mockContext;
-    UserRepository mockUserRepo;
+    UserRepository mockUserRepository;
 
     @BeforeAll
-    static void beforeAll() { testLogger = new TestLogger(); }
+    public static void beforeAllTests() {
+        testLogger = new TestLogger();
+    }
+
+    @AfterAll
+    public static void afterAllTests() {
+        testLogger.close();
+    }
 
     @BeforeEach
-    void setUp() {
+    public void beforeEachTest() {
+        mockUserRepository = mock(UserRepository.class);
+        sut = new PostUserFavoritesHandler(mockUserRepository);
         mockContext = mock(Context.class);
-        mockUserRepo = mock(UserRepository.class);
-
-        sut = new PostUserFavoritesHandler(mockUserRepo);
-
         when(mockContext.getLogger()).thenReturn(testLogger);
     }
 
     @AfterEach
-    void tearDown() {
+    public void afterEachTest() {
         sut = null;
-        mockContext = null;
-        mockUserRepo = null;
-    }
-
-    @AfterAll
-    void afterAll() {
-        testLogger.close();
-    }
-
-    @Test
-    void handleRequest() {
+        reset(mockContext, mockUserRepository);
     }
 }

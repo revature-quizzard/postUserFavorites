@@ -5,6 +5,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.revature.post_user_favorites.models.SetDocument;
+import com.revature.post_user_favorites.models.User;
 import com.revature.post_user_favorites.stubs.TestLogger;
 import org.junit.jupiter.api.*;
 import software.amazon.awssdk.http.HttpStatusCode;
@@ -52,9 +54,10 @@ public class PostUserFavoritesHandlerTest {
     public void given_validParamsAndValidRequestBody_returnsSuccess() {
         SetDocument requestBody = SetDocument.builder()
                 .id("valid")
-                .name("valid")
+                .set_name("valid")
                 .tags(new ArrayList<>())
-                .isPublic(true)
+                .is_public(true)
+                .author("valid")
                 .views(0)
                 .plays(0)
                 .studies(0)
@@ -64,30 +67,30 @@ public class PostUserFavoritesHandlerTest {
         User validUser = User.builder()
                 .id("valid")
                 .username("valid")
-                .favoriteSets(new ArrayList<>())
-                .createdSets(new ArrayList<>())
-                .profilePicture("valid")
+                .favorite_sets(new ArrayList<>())
+                .created_sets(new ArrayList<>())
+                .profile_picture("valid")
                 .points(0)
                 .wins(0)
                 .losses(0)
-                .registrationDate("valid")
+                .registration_date("valid")
                 .gameRecords(new ArrayList<>())
                 .build();
 
         User expectedUser = User.builder()
                 .id("valid")
                 .username("valid")
-                .favoriteSets(new ArrayList<>())
-                .createdSets(new ArrayList<>())
-                .profilePicture("valid")
+                .favorite_sets(new ArrayList<>())
+                .created_sets(new ArrayList<>())
+                .profile_picture("valid")
                 .points(0)
                 .wins(0)
                 .losses(0)
-                .registrationDate("valid")
+                .registration_date("valid")
                 .gameRecords(new ArrayList<>())
                 .build();
 
-        expectedUser.getFavoriteSets().add(requestBody);
+        expectedUser.getFavorite_sets().add(requestBody);
 
         APIGatewayProxyRequestEvent mockRequestEvent = new APIGatewayProxyRequestEvent();
         mockRequestEvent.withPath("/users/favorites");

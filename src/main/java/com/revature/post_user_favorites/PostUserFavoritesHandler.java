@@ -19,7 +19,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
     private final UserRepository userRepository;
 
     public PostUserFavoritesHandler() {
-        userRepository = UserRepository.getInstance();
+        userRepository = new UserRepository();
     }
 
     public PostUserFavoritesHandler(UserRepository userRepository) {

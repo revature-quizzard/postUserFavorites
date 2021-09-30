@@ -123,6 +123,7 @@ public class PostUserFavoritesHandlerTest {
 
         APIGatewayProxyResponseEvent expectedResponse = new APIGatewayProxyResponseEvent();
         expectedResponse.setStatusCode(HttpStatusCode.BAD_REQUEST);
+        expectedResponse.setBody("Missing params in request");
 
         APIGatewayProxyResponseEvent actualResponse = sut.handleRequest(mockRequestEvent, mockContext);
 

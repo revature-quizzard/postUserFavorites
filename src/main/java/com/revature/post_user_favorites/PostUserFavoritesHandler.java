@@ -60,7 +60,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
             return responseEvent;
         }
 
-        user.getFavorite_sets().add(setDocument); // add the document to favorites
+        user.getFavoriteSets().add(setDocument); // add the document to favorites
         responseEvent.setBody(mapper.toJson(userRepository.saveUser(user))); // save the user
         return responseEvent;
     }

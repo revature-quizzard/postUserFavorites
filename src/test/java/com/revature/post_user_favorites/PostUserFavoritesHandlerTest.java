@@ -54,9 +54,9 @@ public class PostUserFavoritesHandlerTest {
     public void given_validParamsAndValidRequestBody_returnsSuccess() {
         SetDocument requestBody = SetDocument.builder()
                 .id("valid")
-                .set_name("valid")
+                .setName("valid")
                 .tags(new ArrayList<>())
-                .is_public(true)
+                .isPublic(true)
                 .author("valid")
                 .views(0)
                 .plays(0)
@@ -67,30 +67,30 @@ public class PostUserFavoritesHandlerTest {
         User validUser = User.builder()
                 .id("valid")
                 .username("valid")
-                .favorite_sets(new ArrayList<>())
-                .created_sets(new ArrayList<>())
-                .profile_picture("valid")
+                .favoriteSets(new ArrayList<>())
+                .createdSets(new ArrayList<>())
+                .profilePicture("valid")
                 .points(0)
                 .wins(0)
                 .losses(0)
-                .registration_date("valid")
+                .registrationDate("valid")
                 .gameRecords(new ArrayList<>())
                 .build();
 
         User expectedUser = User.builder()
                 .id("valid")
                 .username("valid")
-                .favorite_sets(new ArrayList<>())
-                .created_sets(new ArrayList<>())
-                .profile_picture("valid")
+                .favoriteSets(new ArrayList<>())
+                .createdSets(new ArrayList<>())
+                .profilePicture("valid")
                 .points(0)
                 .wins(0)
                 .losses(0)
-                .registration_date("valid")
+                .registrationDate("valid")
                 .gameRecords(new ArrayList<>())
                 .build();
 
-        expectedUser.getFavorite_sets().add(requestBody);
+        expectedUser.getFavoriteSets().add(requestBody);
 
         APIGatewayProxyRequestEvent mockRequestEvent = new APIGatewayProxyRequestEvent();
         mockRequestEvent.withPath("/users/favorites");

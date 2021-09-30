@@ -5,6 +5,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.revature.post_user_favorites.models.SetDocument;
+import com.revature.post_user_favorites.models.User;
 import com.revature.post_user_favorites.stubs.TestLogger;
 import org.junit.jupiter.api.*;
 import software.amazon.awssdk.http.HttpStatusCode;
@@ -52,9 +54,10 @@ public class PostUserFavoritesHandlerTest {
     public void given_validParamsAndValidRequestBody_returnsSuccess() {
         SetDocument requestBody = SetDocument.builder()
                 .id("valid")
-                .name("valid")
+                .setName("valid")
                 .tags(new ArrayList<>())
                 .isPublic(true)
+                .author("valid")
                 .views(0)
                 .plays(0)
                 .studies(0)

@@ -1,26 +1,43 @@
 package com.revature.post_user_favorites;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.revature.post_user_favorites.models.User;
 import lombok.SneakyThrows;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public class UserRepository {
 
-    private final DynamoDBMapper dbReader;
+    public static final UserRepository userRepository = new UserRepository();
+    public final DynamoDbTable<User> userTable;
 
-    public UserRepository() {
-        dbReader = new DynamoDBMapper(AmazonDynamoDBClientBuilder.defaultClient());
+    private UserRepository() {
+        DynamoDbClient db = DynamoDbClient.builder().httpClient(ApacheHttpClient.create()).build();
+        DynamoDbEnhancedClient dbClient = DynamoDbEnhancedClient.builder().dynamoDbClient(db).build();
+        userTable = dbClient.table("Users", TableSchema.fromBean(User.class));
+    }
+
+    public static UserRepository getInstance() {
+        return userRepository;
     }
 
     @SneakyThrows
     public User findUserById(String id) {
-        User user = dbReader.load(User.class, id);
+        AttributeValue value = AttributeValue.builder().s(id).build();
+        Expression filter = Expression.builder().expression("#a = :b").putExpressionName("#a", "id").putExpressionValue(":b", value).build();
+        ScanEnhancedRequest request = ScanEnhancedRequest.builder().filterExpression(filter).build();
+        User user = userTable.scan(request).stream().findFirst().orElseThrow(RuntimeException::new).items().get(0);
         return user;
     }
 
     @SneakyThrows
     public User saveUser(User user) {
-        dbReader.save(user);
+        userTable.updateItem(user);
         return user;
     }
 }

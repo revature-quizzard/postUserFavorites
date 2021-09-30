@@ -7,6 +7,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.revature.post_user_favorites.models.SetDocument;
+import com.revature.post_user_favorites.models.User;
 import software.amazon.awssdk.http.HttpStatusCode;
 
 import java.util.Map;
@@ -17,7 +19,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
     private final UserRepository userRepository;
 
     public PostUserFavoritesHandler() {
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
     }
 
     public PostUserFavoritesHandler(UserRepository userRepository) {
@@ -40,19 +42,21 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
         LambdaLogger logger = context.getLogger();
         logger.log("RECEIVED EVENT: " + requestEvent);
 
-        Map<String, String> pathParams = requestEvent.getQueryStringParameters();
+        Map<String, String> queryStringParams = requestEvent.getQueryStringParameters();
         SetDocument setDocument = mapper.fromJson(requestEvent.getBody(), SetDocument.class);
 
         // returns a bad request status code if params or document to be added is null
-        if (pathParams == null || setDocument == null) {
+        if (queryStringParams == null || setDocument == null) {
             responseEvent.setStatusCode(HttpStatusCode.BAD_REQUEST);
+            responseEvent.setBody("Missing params in request");
             return responseEvent;
         }
 
-        User user = userRepository.findUserById(pathParams.get("user_id")); // search for user in database
+        User user = userRepository.findUserById(queryStringParams.get("user_id")); // search for user in database
 
         if (user == null) {
-            responseEvent.setStatusCode(HttpStatusCode.UNAUTHORIZED);
+            responseEvent.setStatusCode(HttpStatusCode.BAD_REQUEST);
+            responseEvent.setBody("No user found");
             return responseEvent;
         }
 

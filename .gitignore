@@ -32,3 +32,6 @@ target/
 # Properties files
 *.properties
 application*.yml
+
+#aws files
+.aws-sam

@@ -5,14 +5,19 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.revature.post_user_favorites.models.Set;
 import com.revature.post_user_favorites.models.SetDocument;
 import com.revature.post_user_favorites.models.User;
+import com.revature.post_user_favorites.repositories.SetRepository;
+import com.revature.post_user_favorites.repositories.UserRepository;
 import com.revature.post_user_favorites.stubs.TestLogger;
 import org.junit.jupiter.api.*;
 import software.amazon.awssdk.http.HttpStatusCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -25,6 +30,7 @@ public class PostUserFavoritesHandlerTest {
     PostUserFavoritesHandler sut;
     Context mockContext;
     UserRepository mockUserRepository;
+    SetRepository mockSetRepo;
 
     @BeforeAll
     public static void beforeAllTests() {
@@ -39,7 +45,8 @@ public class PostUserFavoritesHandlerTest {
     @BeforeEach
     public void beforeEachTest() {
         mockUserRepository = mock(UserRepository.class);
-        sut = new PostUserFavoritesHandler(mockUserRepository);
+        mockSetRepo = mock(SetRepository.class);
+        sut = new PostUserFavoritesHandler(mockUserRepository, mockSetRepo);
         mockContext = mock(Context.class);
         when(mockContext.getLogger()).thenReturn(testLogger);
     }
@@ -90,6 +97,8 @@ public class PostUserFavoritesHandlerTest {
                 .gameRecords(new ArrayList<>())
                 .build();
 
+        Set validSet = new Set();
+
         expectedUser.getFavoriteSets().add(requestBody);
 
         APIGatewayProxyRequestEvent mockRequestEvent = new APIGatewayProxyRequestEvent();
@@ -101,9 +110,15 @@ public class PostUserFavoritesHandlerTest {
 
         when(mockUserRepository.findUserById(anyString())).thenReturn(validUser);
         when(mockUserRepository.saveUser(any())).thenReturn(expectedUser);
+        when(mockSetRepo.getSetById(anyString())).thenReturn(validSet);
 
         APIGatewayProxyResponseEvent expectedResponse = new APIGatewayProxyResponseEvent();
         expectedResponse.setBody(mapper.toJson(expectedUser));
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization");
+        headers.put("Access-Control-Allow-Origin", "*");
+        expectedResponse.setHeaders(headers);
 
         APIGatewayProxyResponseEvent actualResponse = sut.handleRequest(mockRequestEvent, mockContext);
 
@@ -123,6 +138,13 @@ public class PostUserFavoritesHandlerTest {
 
         APIGatewayProxyResponseEvent expectedResponse = new APIGatewayProxyResponseEvent();
         expectedResponse.setStatusCode(HttpStatusCode.BAD_REQUEST);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization");
+        headers.put("Access-Control-Allow-Origin", "*");
+        expectedResponse.setHeaders(headers);
+
+        expectedResponse.setBody("Missing params in request");
 
         APIGatewayProxyResponseEvent actualResponse = sut.handleRequest(mockRequestEvent, mockContext);
 

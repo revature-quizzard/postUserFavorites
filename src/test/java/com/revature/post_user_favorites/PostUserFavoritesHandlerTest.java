@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.revature.post_user_favorites.models.Set;
 import com.revature.post_user_favorites.models.SetDocument;
 import com.revature.post_user_favorites.models.User;
 import com.revature.post_user_favorites.repositories.SetRepository;
@@ -96,6 +97,8 @@ public class PostUserFavoritesHandlerTest {
                 .gameRecords(new ArrayList<>())
                 .build();
 
+        Set validSet = new Set();
+
         expectedUser.getFavoriteSets().add(requestBody);
 
         APIGatewayProxyRequestEvent mockRequestEvent = new APIGatewayProxyRequestEvent();
@@ -107,6 +110,7 @@ public class PostUserFavoritesHandlerTest {
 
         when(mockUserRepository.findUserById(anyString())).thenReturn(validUser);
         when(mockUserRepository.saveUser(any())).thenReturn(expectedUser);
+        when(mockSetRepo.getSetById(anyString())).thenReturn(validSet);
 
         APIGatewayProxyResponseEvent expectedResponse = new APIGatewayProxyResponseEvent();
         expectedResponse.setBody(mapper.toJson(expectedUser));

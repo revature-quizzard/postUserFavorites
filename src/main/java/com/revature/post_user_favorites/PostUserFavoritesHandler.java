@@ -47,7 +47,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent requestEvent, Context context) {
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
 
-        // For CORs
+        // For CORS
         Map<String, String> headers = new HashMap<>();
         headers.put("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization");
         headers.put("Access-Control-Allow-Origin", "*");

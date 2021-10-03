@@ -56,6 +56,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
         LambdaLogger logger = context.getLogger();
         logger.log("RECEIVED EVENT: " + requestEvent);
 
+        // Getting setdocument from body
         Map<String, String> queryStringParams = requestEvent.getQueryStringParameters();
         SetDocument setDocument = mapper.fromJson(requestEvent.getBody(), SetDocument.class);
 
@@ -66,6 +67,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
             return responseEvent;
         }
 
+        // Retrieving set from database
         Set set = setRepo.getSetById(setDocument.getId());
 
         if (set == null){
@@ -75,6 +77,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
             return responseEvent;
         }
 
+        // Retrieving user from database
         User user = userRepository.findUserById(queryStringParams.get("user_id")); // search for user in database
 
         if (user == null) {
@@ -83,6 +86,7 @@ public class PostUserFavoritesHandler implements RequestHandler<APIGatewayProxyR
             return responseEvent;
         }
 
+        // Adding count to favorites
         set.setFavorites(set.getFavorites() + 1);
         setDocument = new SetDocument(set);
         setRepo.updateSet(set);
